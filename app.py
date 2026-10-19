@@ -3,7 +3,7 @@ from google import genai
 import requests
 import tempfile
 import base64
-
+from flask_cors import CORS
 
 import os
 from dotenv import load_dotenv
