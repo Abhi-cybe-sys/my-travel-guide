@@ -1,5 +1,4 @@
-from flask import Flask, jsonify, request
-from flask_cors import CORS
+from flask import Flask, jsonify, request, send_from_directory
 from google import genai
 import requests
 import tempfile
@@ -13,7 +12,9 @@ load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
-
+@app.route("/")
+def home():
+    return send_from_directory(".", "index.html")
 
 # ============================================================
 # API KEYS
