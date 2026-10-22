@@ -16,6 +16,10 @@ CORS(app)
 def home():
     return send_from_directory(".", "index.html")
 
+@app.route("/index.js")
+def javascript():
+    return send_from_directory(".", "index.js")
+
 # ============================================================
 # API KEYS
 # ============================================================
