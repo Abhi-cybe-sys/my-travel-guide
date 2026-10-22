@@ -96,6 +96,47 @@ const searchPreviewTitle =
 const searchInput = document.getElementById("searchInput");
 const searchButton = document.getElementById("searchBtn");
 
+async function findDestinationImage(placeName) {
+  try {
+    const url =
+      "https://commons.wikimedia.org/w/api.php?" +
+      "action=query&generator=search" +
+      "&gsrnamespace=6" +
+      "&gsrlimit=5" +
+      "&gsrsearch=" +
+      encodeURIComponent(placeName) +
+      "&prop=imageinfo" +
+      "&iiprop=url" +
+      "&iiurlwidth=800" +
+      "&format=json" +
+      "&origin=*";
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error("Could not fetch destination image.");
+    }
+
+    const data = await response.json();
+    const pages = data.query?.pages;
+
+    if (!pages) {
+      return "";
+    }
+
+    const imagePages = Object.values(pages);
+
+    const imagePage = imagePages.find((page) =>
+      page.imageinfo?.[0]?.thumburl
+    );
+
+    return imagePage?.imageinfo?.[0]?.thumburl || "";
+  } catch (error) {
+    console.error("Image search error:", error);
+    return "";
+  }
+}
+
 async function searchNewDestination() {
   const query = searchInput.value.trim();
 
@@ -126,12 +167,9 @@ async function searchNewDestination() {
     }
 
     const destination = results[0];
-    const placeName = destination.display_name;
-
-    // Reuse an existing destination image for the preview.
-    const firstCard = document.querySelector(".place-card:not(.search-preview-card)");
-    const image ="" ;
-
+const placeName = destination.display_name;
+searchButton.textContent = "Finding photo...";
+const image = await findDestinationImage(query);
     // Use your existing destination-selection function.
     selectDestination(placeName, image);
 
@@ -212,6 +250,10 @@ function selectDestination(
 
 if (image) {
   searchPreviewImage.src = image;
+  searchPreviewImage.classList.remove("hidden");
+} else {
+  searchPreviewImage.removeAttribute("src");
+  searchPreviewImage.classList.add("hidden");
 }    searchPreviewTitle.textContent = place;
 
     searchPreviewCard.classList.remove("hidden");
