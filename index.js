@@ -130,9 +130,7 @@ async function searchNewDestination() {
 
     // Reuse an existing destination image for the preview.
     const firstCard = document.querySelector(".place-card:not(.search-preview-card)");
-    const image =
-      firstCard?.dataset.image ||
-      searchPreviewImage.src;
+    const image ="" ;
 
     // Use your existing destination-selection function.
     selectDestination(placeName, image);
@@ -212,8 +210,9 @@ function selectDestination(
 
   } else {
 
-    searchPreviewImage.src = image;
-    searchPreviewTitle.textContent = place;
+if (image) {
+  searchPreviewImage.src = image;
+}    searchPreviewTitle.textContent = place;
 
     searchPreviewCard.classList.remove("hidden");
     searchPreviewCard.classList.add("active");
