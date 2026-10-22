@@ -402,17 +402,32 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-  const travelMap = L.map('travelMap').setView([27.1751, 78.0421], 13);
+  
+const travelMap = L.map('travelMap').setView([27.1751, 78.0421], 13);
 
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '&copy; OpenStreetMap contributors'
-  }).addTo(travelMap);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19,
+  attribution: '&copy; OpenStreetMap contributors'
+}).addTo(travelMap);
 
-  L.marker([27.1751, 78.0421])
-    .addTo(travelMap)
-    .bindPopup('<b>Taj Mahal</b><br>Agra, India')
+// Initial marker: Taj Mahal
+let currentDestinationMarker = L.marker([27.1751, 78.0421])
+  .addTo(travelMap)
+  .bindPopup('<b>Taj Mahal</b><br>Agra, India')
+  .openPopup();
+
+// Update the map whenever a new place is searched
+window.addEventListener('destination-found', (event) => {
+  const { name, lat, lon } = event.detail;
+
+  travelMap.setView([lat, lon], 13);
+
+  currentDestinationMarker
+    .setLatLng([lat, lon])
+    .setPopupContent(`<b>${name}</b>`)
     .openPopup();
+});
+
 </script>
 
 </body>

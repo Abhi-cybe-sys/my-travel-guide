@@ -91,7 +91,80 @@ const searchPreviewImage =
   document.getElementById("searchPreviewImage");
 
 const searchPreviewTitle =
-  document.getElementById("searchPreviewTitle");
+  document.getElementById("searchPreviewTitle"); 
+  
+const searchInput = document.getElementById("searchInput");
+const searchButton = document.getElementById("searchBtn");
+
+async function searchNewDestination() {
+  const query = searchInput.value.trim();
+
+  if (!query) {
+    alert("Please enter a place to explore.");
+    return;
+  }
+
+  searchButton.disabled = true;
+  searchButton.textContent = "Searching...";
+
+  try {
+    const url =
+      "https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=" +
+      encodeURIComponent(query);
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error("The place search service is unavailable.");
+    }
+
+    const results = await response.json();
+
+    if (!results.length) {
+      alert("Place not found. Try another name or include the city.");
+      return;
+    }
+
+    const destination = results[0];
+    const placeName = destination.display_name;
+
+    // Reuse an existing destination image for the preview.
+    const firstCard = document.querySelector(".place-card:not(.search-preview-card)");
+    const image =
+      firstCard?.dataset.image ||
+      searchPreviewImage.src;
+
+    // Use your existing destination-selection function.
+    selectDestination(placeName, image);
+
+    // Tell the map to move to this destination.
+    window.dispatchEvent(
+      new CustomEvent("destination-found", {
+        detail: {
+          name: placeName,
+          lat: Number(destination.lat),
+          lon: Number(destination.lon)
+        }
+      })
+    );
+
+  } catch (error) {
+    console.error("Destination search error:", error);
+    alert("Could not search right now. Please try again.");
+  } finally {
+    searchButton.disabled = false;
+    searchButton.textContent = "Explore";
+  }
+}
+
+searchButton.addEventListener("click", searchNewDestination);
+
+searchInput.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    searchNewDestination();
+  }
+});
+
 
 const transcriptToggle =
   document.getElementById("transcriptToggle");
